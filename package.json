@@ -1,0 +1,22 @@
+{
+  "name": "scan-level",
+  "version": "0.0.1",
+  "description": "Scan the level of definition to generate it's object model as JSON output",
+  "main": "scan.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/narqo/scan-level.git"
+  },
+  "author": "Vladimir Varankinv <varankinv@yandex-team.ru> (http://github.com/narqo)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/narqo/scan-level/issues"
+  },
+  "homepage": "https://github.com/narqo/scan-level",
+  "dependencies": {
+    "graceful-fs": "~2.0.1"
+  }
+}
