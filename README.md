@@ -17,7 +17,7 @@ scanl('bem-core/common.blocks', function(err, files) {
     console.error(err);
     return;
   }
-  console.log(inspect(files, { depth : 9 }));
+  console.log(inspect(files, { depth : 3 }));
 });
 ```
 
