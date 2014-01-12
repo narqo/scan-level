@@ -1,7 +1,7 @@
 scan-level
 ==========
 
-Scan the level of definition to generate it's object model as JSON output.
+Scan the level of definition to generate it's object model as JSON object.
 
 Most of source code is taken from [bem-tools] project (MIT License) with
 some minor refactoring.
@@ -10,14 +10,14 @@ some minor refactoring.
 
 ```javascript
 var scanl = require('scan-level'),
-  inspect = require('util').inspect;
+    inspect = require('util').inspect;
 
 scanl('bem-core/common.blocks', function(err, files) {
-  if(err) {
-    console.error(err);
-    return;
-  }
-  console.log(inspect(files, { depth : 3 }));
+    if(err) {
+        console.error(err);
+        return;
+    }
+    console.log(inspect(files, { depth : 3 }));
 });
 ```
 
@@ -62,9 +62,13 @@ part of ouput:
 var scanl = require('scan-level');
 ```
 
-### `scanl(path, cb)`
+### `scanl(dir, opts, cb)`
 
-**TODO** pass options to `scanl` function.
+* `dir` is a string path for your level;
+* `cb` is a callback function with signature `err, files`.
+
+You could specify your custom function-scanner, with `opts.scanner` option.
+See [scan-simple.js](example) example for usage.
 
 ## Install
 
