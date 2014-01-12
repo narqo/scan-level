@@ -1,6 +1,6 @@
 {
   "name": "scan-level",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Scan the level of definition to generate it's object model as JSON object",
   "main": "scan.js",
   "scripts": {
