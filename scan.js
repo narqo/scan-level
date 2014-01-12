@@ -2,7 +2,18 @@ var path = require('path'),
     fs = require('graceful-fs'),
     sep = path.sep;
 
-module.exports = function scanFiles(dir, callback) {
+/**
+ * @param {String} dir
+ * @param {Object} [opts]
+ * @param {Function} [opts.scanner]
+ * @param {Function} callback
+ */
+module.exports = function scanFiles(dir, opts, callback) {
+    if(!callback) {
+        callback = opts;
+        opts = {};
+    }
+
     dir = path.resolve(dir);
 
     if(!fs.existsSync(dir)) {
@@ -16,16 +27,18 @@ module.exports = function scanFiles(dir, callback) {
             files : list,
             tree : blocks,
             blocks : flat
-        };
+        },
+        items = { push : push },
+        scanBlock = opts.scanner || scanElem;
 
-    scanBlocks(dir, function(err) {
+    scanBlocks(dir, scanBlock, function(err) {
         if(err) return callback(err);
         callback(null, files);
     });
 
     return;
 
-    function pushItem(file, item) {
+    function push(file, item) {
         file.suffix = item.suffix[0] === '.'? item.suffix.substr(1) : item.suffix;
 
         (list[file.suffix] || (list[file.suffix] = [])).push(file);
@@ -48,18 +61,12 @@ module.exports = function scanFiles(dir, callback) {
         (block.files[file.suffix] || (block.files[file.suffix] = [])).push(file);
     }
 
-    function scanBlocks(dir, scaner, callback) {
-        if(arguments.length < 2) throw new Error('"scanBlocks" callback function required');
-        if(typeof callback !== 'function') {
-            callback = scaner;
-            scaner = scanElem;
-        }
-        if(scaner == null) scaner = scanElem;
-        scaner = scaner.bind(null);
-        walk(dir, function(f, next) { scaner(f, null, next) }, callback);
+    function scanBlocks(dir, scanner, callback) {
+        scanner = scanner.bind(null);
+        walk(dir, function(f, next) { scanner(f, null, items, next) }, callback);
     }
 
-    function scanElem(block, elem, callback) {
+    function scanElem(block, elem, items, callback) {
         var blockPart = block.file,
             dir = block.fullpath;
 
@@ -90,11 +97,11 @@ module.exports = function scanFiles(dir, callback) {
 
             if(f.stat.isDirectory()) {
                 if(isElemDir(file)) {
-                    scanElem(block, f, next);
+                    scanElem(block, f, items, next);
                     return;
                 }
                 if(isModDir(file)) {
-                    scanMod(block, elem, f, next);
+                    scanMod(block, elem, f, items, next);
                     return;
                 }
                 if(!isLooksGood) {
@@ -102,7 +109,7 @@ module.exports = function scanFiles(dir, callback) {
                     return;
                 }
 
-                pushItem(f, item);
+                items.push(f, item);
 
                 walk(f.fullpath, function(f, next) {
                     var suffix = (file + sep + f.file).substr(blockPartL - 1),
@@ -113,21 +120,21 @@ module.exports = function scanFiles(dir, callback) {
 
                     if(elem) item.elem = elem.file.substr(2);
 
-                    pushItem(f, item);
+                    items.push(f, item);
                     next();
 
                 }, next);
                 return;
             }
 
-            pushItem(f, item);
+            items.push(f, item);
 
             next();
 
         }, callback);
     }
 
-    function scanMod(block, elem, mod, callback) {
+    function scanMod(block, elem, mod, items, callback) {
         var blockPart = block.file + (elem? elem.file : '') + mod.file,
             blockPartL = blockPart.length;
 
@@ -155,7 +162,7 @@ module.exports = function scanFiles(dir, callback) {
             if(elem) item.elem = elem.file.substr(2);
             if(val) item.val = val.substr(0, val.indexOf('.'));
 
-            pushItem(f, item);
+            items.push(f, item);
 
             if(f.stat.isDirectory()) {
                 walk(f.fullpath, function(f, next) {
@@ -169,7 +176,7 @@ module.exports = function scanFiles(dir, callback) {
                     if(elem) item.elem = elem.file.substr(2);
                     if(val) item.val = val.substr(0, val.indexOf('.'));
 
-                    pushItem(f, item);
+                    items.push(f, item);
 
                     next();
                 }, next);
