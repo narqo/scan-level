@@ -127,6 +127,8 @@ module.exports = function scanFiles(dir, opts, callback) {
                 return;
             }
 
+            item.elem && (item.elem = item.elem.match(/.*__([a-z1-9\-]+)\./)[1]);
+
             items.push(f, item);
 
             next();
