@@ -65,7 +65,7 @@ var scanl = require('scan-level');
 ### `scanl(dir, opts, cb)`
 
 * `dir` is a string path for your level;
-* `cb` is a callback function with signature `err, files`.
+* `cb(err, files)` is a callback function with scanning results.
 
 You could specify your custom function-scanner, with `opts.scanner` option.
 See [scan-simple.js](example) example for usage.
