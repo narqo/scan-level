@@ -68,10 +68,12 @@ module.exports = function scanFiles(dir, opts, callback) {
 
     function scanElem(block, elem, items, callback) {
         var blockPart = block.file,
-            dir = block.fullpath;
+            dir = block.fullpath,
+            elemName;
 
         if(elem) {
-            blockPart += elem.file;
+            elemName = elem.file;
+            blockPart += elemName;
             dir = elem.fullpath;
         }
 
@@ -93,7 +95,10 @@ module.exports = function scanFiles(dir, opts, callback) {
                     suffix : suffix
                 };
 
-            if(elem) item.elem = file;
+            if(elemName) {
+                if(elemName.indexOf('__') === 0) elemName = elemName.substr(2);
+                item.elem = elemName;
+            }
 
             if(f.stat.isDirectory()) {
                 if(isElemDir(file)) {
@@ -118,7 +123,7 @@ module.exports = function scanFiles(dir, opts, callback) {
                             suffix : suffix
                         };
 
-                    if(elem) item.elem = elem.file.substr(2);
+                    if(elemName) item.elem = elemName;
 
                     items.push(f, item);
                     next();
